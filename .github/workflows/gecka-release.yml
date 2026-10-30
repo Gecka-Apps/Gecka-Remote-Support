@@ -224,12 +224,21 @@ jobs:
           Remove-Item $pfx
 
       - name: Publish to release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           tag_name: ${{ github.ref_name }}
           prerelease: false
           body: ${{ env.RELEASE_BODY }}
           files: out/*
+
+      - name: Upload build artifacts
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: windows-${{ matrix.variant.id }}
+          path: out/*
+          if-no-files-found: error
 
   # ------------------------------------------------------------------ Linux
   linux:
@@ -369,12 +378,21 @@ jobs:
           popd
 
       - name: Publish to release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           tag_name: ${{ github.ref_name }}
           prerelease: false
           body: ${{ env.RELEASE_BODY }}
           files: out/*
+
+      - name: Upload build artifacts
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: linux-${{ matrix.variant.id }}
+          path: out/*
+          if-no-files-found: error
 
   # ------------------------------------------------------------------ macOS
   macos:
@@ -495,12 +513,21 @@ jobs:
             ./flutter/build/macos/Build/Products/Release/${{ matrix.variant.app }}.app
 
       - name: Publish to release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           tag_name: ${{ github.ref_name }}
           prerelease: false
           body: ${{ env.RELEASE_BODY }}
           files: out/*
+
+      - name: Upload build artifacts
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: macos-${{ matrix.variant.id }}-${{ matrix.job.arch }}
+          path: out/*
+          if-no-files-found: error
 
   # ----------------------------------------------------------------- Android
   # Native lib per (variant, arch); the apk is assembled by the `android` job.
@@ -827,9 +854,18 @@ jobs:
           BUILD_TOOLS_VERSION: ${{ env.ANDROID_SIGN_TOOL_VERSION }}
 
       - name: Publish to release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           tag_name: ${{ github.ref_name }}
           prerelease: false
           body: ${{ env.RELEASE_BODY }}
           files: signed-apk/*-signed.apk
+
+      - name: Upload build artifacts
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-${{ matrix.variant.id }}
+          path: signed-apk/*-signed.apk
+          if-no-files-found: error
