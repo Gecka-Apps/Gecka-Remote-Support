@@ -61,3 +61,7 @@ flutter/web/
 .gecka-incoming-only
 # local deployment config (server + its public key); CI uses repo variables
 customize/branding.env
+# libdrmtap is cloned at build time by build.py (not a submodule)
+/third_party/libdrmtap/
+# Local git worktrees
+.worktrees/
